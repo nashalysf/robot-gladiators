@@ -1,34 +1,61 @@
-// Game States
-// "WIN" - Player robot has defeated all enemy-robots
-//    * Fight all enemy-robots
-//    * Defeat each enemy-robot
-// "LOSE" - Player robot's health is zero or less
-//
-//
-//player
-let playerName = window.prompt("What's your robot's name?");
-console.log("Our robot's name is " + playerName);
-window.alert("Welcome to Robot Gladiators " + playerName + "!");
-let playerHealth = 100;
-let playerAttack = 10;
-let playerMoney = 10;
-//enemy
-let enemyNames = ["Roborto", "Amy Android", "Trumble"];
-let enemyHealth = 50;
-let enemyAttack = 12;
-debugger;
+
+//random func before objs si variable is defined
+let randomNumber = function(min, max){
+  let value = Math.floor(Math.random() * (max - min + 1) + 40);
+  return value;
+};
+//player vars by object
+let player = {
+  Name: window.prompt("What's your robot's name?"),
+  Health: 100,
+  Attack: 10,
+  Money: 10,
+  reset: function(){
+    this.Health = 100;
+    this.Money = 10;
+    this.Attack = 10;
+  },
+  refillHealth: function() {
+    this.Health += 20;
+    this.Money -= 7;
+    alert(this.Health);
+  },
+  upgradeAttack: function() {
+    this.Attack += 6;
+    this.Money -= 7;
+    alert(this.Attack);
+  }
+  };
+  //enemy vars by object
+  let enemy = [
+    {
+      name: "Roborto",
+      attack: randomNumber(10, 14)
+    },
+    {
+      name: "Amy Android",
+      attack: randomNumber(10, 14)
+    },
+    {
+      name: "Robo Trumble",
+      attack: randomNumber(10, 14)
+    }
+  ];
+window.alert("Welcome to Robot Gladiators " + player.Name + "!");
+console.log("Our robot's name is " + player.Name);
+//shop func
 let shop = function() {
   var shopOption= prompt("Would you like to REFILL your health, UPGRADE your attack, or LEAVE the store? Please enter one: 'REFILL', 'UPGRADE', or 'LEAVE' to make a choice.");
+  //switch = if
   switch(shopOption) {
+    //option 1
     case "REFILL":
     case "refill":
-      window.confirm("Refilling player's health by 20 for 7 dollars? Current Balance: " + playerMoney);
-      if (playerMoney >= 10){
-        playerHealth = playerHealth + 20;
-        playerMoney = playerMoney - 10;
-        alert(playerMoney);
+      window.confirm("Refill player's health by 20 for 7 dollars? Current Balance: " + player.Money);
+      if (player.Money >= 7){
+        player.refillHealth();
       }
-      else if (playerMoney < 10){
+      else if (player.Money < 7){
         alert("Sorry! Not enough money");
         fight();
       }
@@ -36,15 +63,14 @@ let shop = function() {
         shop();
       };
       break;
-      //
+      //option 2
       case "UPGRADE":
       case "upgrade":
-        window.confirm("Upgrading player's attack by 6 for 7 dollars? Current Balance: " + playerMoney);
-        if(confirm && playerMoney >= 10){
-          playerAttack = playerAttack + 6;
-          playerMoney = playerMoney - 10;
+        window.confirm("Upgrade player's attack by 6 for 7 dollars? Current Balance: " + player.Money);
+        if(confirm && player.Money >= 7){
+          player.upgradeAttack();
         }
-        else if (playerMoney < 10){
+        else if (player.Money < 7){
         alert("Sorry! Not enough money");
         fight();
       }
@@ -52,70 +78,100 @@ let shop = function() {
           shop();
         }
         break;
-        //
+        //option 3
         case "leave":
           window.alert("Leaving the store, bye!");
           break;
+          //else
           default:
             window.alert("You did not pick a valid option. Try again.");
             shop();
             break;
   }
+};//end shop
+//
+//for loop to combat enemy array (func w/ an argument)
+let startGame = function () {
+  for (let i = 0; i < enemy.length; i++) {
+    if (player.Health > 0) {
+      player.reset();
+      window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
+      let pickedEnemyObj = enemy[i];
+      pickedEnemyObj.Health = randomNumber(40, 60);
+      fight(pickedEnemyObj);
+      if(player.Health > 0 && i <= enemy.length - 1){
+        let storeConfirm = confirm("The fight is over, visit the store before the next round?");
+        if (confirm && player.Money >= 7) {
+          alert("Welcome to the shop!");
+          shop();
+        }
+        else {
+          alert("Sorry! Not enough money");
+          fight();
+        }
+        
+      }
+    } 
+    
+  };
+  endGame();
 };
-//end game
-//end game
+// func end game
+let endGame = function () {
+  if (player.Health > 0) {
+    alert(
+      "Great job, you've survived the game! You now have a score of " + player.Money + ".");
+  } else if(player.Health <= 0) {
+    window.alert("The game has now ended. Let's see how you did!");
+    let playAgainConfirm = window.confirm("Would you like to play again?");
+  if (playAgainConfirm) {
+    startGame();
+  }
+  else {
+    window.alert("Thank you for playing Robot Gladiators! Come back soon:)");
+  }
+  }
+  else {
+    fight();
+  }
+//
+};
 //fight expression func with parameter
-let fight = function (enemyName) {
+let fight = function (enemies) {
   let promptFight = window.prompt(
-    "Would you like to FIGHT or SKIP this battle? Enter 'FIGHT' or 'SKIP' to choose."
-  );
-  while (playerHealth > 0 && enemyHealth > 0) {
-  
+    "Would you like to FIGHT or SKIP this battle? Enter 'FIGHT' or 'SKIP' to choose.");
+    debugger;
+    while (player.Health > 0) {
     if (promptFight === "fight" || promptFight === "FIGHT") {
-      //player attack
-      enemyHealth = enemyHealth - playerAttack;
-      if (enemyHealth > 0) {
-        console.log(
-          playerName +
-            " attacked " +
-            enemyName +
-            ". " +
-            enemyName +
-            " now has " +
-            enemyHealth +
-            " health remaining."
-        );
-      } else if (enemyHealth <= 0) {
-        playerMoney = playerMoney + 3;
-        alert(enemyName + " has died");
-        console.log("Player's money: " + playerMoney);
+      //player's parameters attacks at random # 
+      let damage = randomNumber(player.Attack - 3, player.Attack);
+      enemies.Health = Math.max(0, enemies.Health - damage);
+
+      if (enemies.Health > 0) {
+        console.log(player.Name + " attacked " + enemies.name + ". " +  enemies.name + " now has " + enemies.Health + " health remaining.");
+      } else if (enemies.Health <= 0) {
+        player.Money = player.Money + 3;
+        alert(enemies.name + " has died");
+        console.log("Player's money: " + player.Money);
         break;
       }
       //enemy attack
-      playerHealth = playerHealth - enemyAttack;
-      if (playerHealth > 0) {
-        console.log(
-          enemyName +
-            " attacked " +
-            playerName +
-            ". " +
-            playerName +
-            " now has " +
-            playerHealth +
-            " health remaining."
-        );
-      } else if (playerHealth <= 0) {
+       let attacks = randomNumber (enemies.attack - 3, enemies.attack);
+      player.Health = Math.max(0, player.Health - attacks);
+      if (player.Health > 0) {
+        console.log(enemies.name + " attacked " + player.Name + ". " + player.Name + " now has " + player.Health + " health remaining.");
+      } else if (player.Health <= 0) {
         alert("you died");
         break;
       }
     } //end if fight
     else if (promptFight === "skip" || promptFight === "SKIP") {
       let confirmSkip = window.confirm("Are you sure you want to skip?");
-      if (confirmSkip && playerMoney > 0) {
-        playerMoney = playerMoney - 5;
-        alert(playerName + " has chosen to skip. Good bye!");
-        console.log("Player's money: " + playerMoney);
-        if (playerMoney <= 0){
+      if (confirmSkip && player.Money > 0) {
+        player.Money = Math.max(0, player.Money - 5);
+        alert(player.Name + " has chosen to skip. Good bye!");
+        console.log("Player's money: " + player.Money);
+        if (player.Money <= 0){
           console.log("Sorry, out of money");
           break;
         }
@@ -129,56 +185,8 @@ let fight = function (enemyName) {
     }
   } //end of while loop
 }; //end func
-// func end game
-let endGame = function () {
-  if (enemyHealth <= 0 && playerHealth > 0) {
-    alert(
-      "Great job, you've survived the game! You now have a score of " +
-        playerMoney +
-        "."
-    );
-  } else if(playerHealth <= 0) {
-    window.alert("The game has now ended. Let's see how you did!");
-    let playAgainConfirm = window.confirm("Would you like to play again?");
-  if (playAgainConfirm) {
-    startGame();
-  }
-  else {
-    window.alert("Thank you for playing Robot Gladiators! Come back soon:)");
-    shop();
-  }
-  }
-  else {
-    fight();
-  }
-//
-};
-//for loop to combat enemy array (func w/ an argument)
-let startGame = function () {
-  for (let i = 0; i < enemyNames.length; i++) {
-    if (playerHealth > 0) {
-      playerHealth = 100;
-      playerAttack = 10;
-      window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
-      let pickedEnemyName = enemyNames[i];
-      enemyHealth = 50;
-      fight(pickedEnemyName);
-      if(playerHealth > 0 && i < enemyNames.length - 1){
-        let storeConfirm = confirm("The fight is over, visit the store before the next round?");
-        if (confirm) {
-          alert("Welcome to the shop!")
-          shop();
-        }
-        else {
-          fight();
-        }
-      }
-    } 
-    endGame();
-  };
-};
- startGame();
 //
 //CALL
+startGame();
 fight();
 endGame();
